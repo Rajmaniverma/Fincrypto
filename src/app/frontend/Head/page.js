@@ -4,6 +4,7 @@ import Navigationbar from './menu'
 import Stats from './Stats'
 import Graph from './Graph'
 import Dashboard from './Dashboard'
+import SubGraph from './SubGraph/page'
 
 const Head = () => {
   return (

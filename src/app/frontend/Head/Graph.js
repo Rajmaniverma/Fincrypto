@@ -2,20 +2,27 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { createChart, LineSeries } from "lightweight-charts";
+import { useRouter } from "next/navigation";
 
 const Graph = ({ companyName, api }) => {
   const chartRef = useRef(null);
-
+    const router = useRouter();
   const [change, setChange] = useState(0);
   const [changePercent, setChangePercent] = useState(0);
   const [isProfit, setIsProfit] = useState(true);
+const senddata = (api,companyName) => {
+  router.push(
+  `./frontend/Head/SubGraph?api=${encodeURIComponent(api)}&company=${encodeURIComponent(companyName)}`
+);
+};
 
   useEffect(() => {
     if (!chartRef.current) return;
 
     const chart = createChart(chartRef.current, {
-      width: 500,
-      height: 250,
+      width: 300,
+      height: 150,
+      
 
       layout: {
         background: {
@@ -85,7 +92,7 @@ const Graph = ({ companyName, api }) => {
   }, [api]);
 
   return (
-    <div className="bg-gray-900 p-4 rounded-lg shadow-lg">
+    <div className="bg-gray-900 p-4 rounded-lg shadow-lg cursor-pointer" onClick={()=>senddata(api,companyName)}>
       <h2 className="text-white text-xl font-bold mb-2">
         {companyName}
       </h2>
