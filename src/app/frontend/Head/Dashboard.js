@@ -17,6 +17,10 @@ const Dashboard = () => {
       name: "Solana",
       api: "https://api.coingecko.com/api/v3/coins/solana/market_chart?vs_currency=usd&days=1",
     },
+    {
+      name:"coingecko",
+      api:"https://api.coingecko.com/api/v3/coins/dogecoin/market_chart?vs_currency=usd&days=1"
+    }
 
     // Add more APIs here
     // {
