@@ -20,7 +20,7 @@ const SubGraph = () => {
     if (!chartRef.current || !api) return;
 
     const chart = createChart(chartRef.current, {
-      width: chartRef.current.clientWidth || 600,
+      width: chartRef.current.clientWidth || 400,
       height: 400,
 
       layout: {
@@ -88,7 +88,9 @@ const SubGraph = () => {
   }, [api]);
 
   return (
-    <div className="bg-gray-900 p-4 rounded-lg shadow-lg">
+    <div className="w-full min-h-screen flex items-center">
+   
+    <div className="bg-gray-900 p-4 rounded-lg shadow-lg w-full max-w-6xl mx-auto  overflow-hidden ">
       <h2 className="text-white text-2xl font-bold mb-4">
         {companyName}
       </h2>
@@ -113,7 +115,7 @@ const SubGraph = () => {
       </div>
 
       <div ref={chartRef} className="w-full" />
-    </div>
+    </div> </div>
   );
 };
 

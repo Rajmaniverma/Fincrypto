@@ -13,9 +13,11 @@ const Clock = () => {
     return () => clearInterval(interval);
   }, []);
 
+  if (!time) return null;
+
   return (
     <>
-      <h1>{time.toLocaleDateString()}</h1>
+      <h1>{time.toLocaleDateString("en-GB")}</h1>
       <h2>{time.toLocaleTimeString()}</h2>
     </>
   );

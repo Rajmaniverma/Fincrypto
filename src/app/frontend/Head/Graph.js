@@ -92,7 +92,7 @@ const senddata = (api,companyName) => {
   }, [api]);
 
   return (
-    <div className="bg-gray-900 p-4 rounded-lg shadow-lg cursor-pointer" onClick={()=>senddata(api,companyName)}>
+    <div className="bg-gray-900 p-4 rounded-lg shadow-lg cursor-pointer"  onClick={()=>senddata(api,companyName)}>
       <h2 className="text-white text-xl font-bold mb-2">
         {companyName}
       </h2>

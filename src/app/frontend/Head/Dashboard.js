@@ -7,17 +7,16 @@ const Dashboard = () => {
 const companies = [
   {
     name: "Bitcoin",
-    api: "https://api.coingecko.com/api/v3/coins/bitcoin/ohlc?vs_currency=usd&days=1",
+    api: "https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=1",
   },
   {
     name: "Ethereum",
-    api: "https://api.coingecko.com/api/v3/coins/ethereum/ohlc?vs_currency=usd&days=1",
+    api: "https://api.coingecko.com/api/v3/coins/ethereum/market_chart?vs_currency=usd&days=1",
   },
   {
     name: "Solana",
-    api: "https://api.coingecko.com/api/v3/coins/solana/ohlc?vs_currency=usd&days=1",
+    api: "https://api.coingecko.com/api/v3/coins/solana/market_chart?vs_currency=usd&days=1",
   },
-
 ];
     // Add more APIs here
     // {
