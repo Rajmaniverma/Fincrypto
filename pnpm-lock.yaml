@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      finviz:
+        specifier: 'link:'
+        version: 'link:'
       lightweight-charts:
         specifier: ^5.2.0
         version: 5.2.0

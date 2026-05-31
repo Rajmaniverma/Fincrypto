@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "finviz": "link:",
     "lightweight-charts": "^5.2.0",
     "next": "16.2.6",
     "react": "19.2.4",
