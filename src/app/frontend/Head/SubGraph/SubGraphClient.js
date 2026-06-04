@@ -14,14 +14,15 @@ const SubGraphClient = () => {
   const searchParams = useSearchParams();
 
   const api = searchParams.get("api") ?? "";
-  const companyName = searchParams.get("company") ?? "Unknown Company";
+  const companyName =
+    searchParams.get("company") ?? "Unknown Company";
 
   useEffect(() => {
     if (!chartRef.current || !api) return;
 
     const chart = createChart(chartRef.current, {
-      width: chartRef.current.clientWidth || 800,
-      height: 400,
+      width: chartRef.current.clientWidth,
+      height: chartRef.current.clientHeight,
 
       layout: {
         background: {
@@ -38,11 +39,23 @@ const SubGraphClient = () => {
           color: "#374151",
         },
       },
+
+      rightPriceScale: {
+        scaleMargins: {
+          top: 0.1,
+          bottom: 0.1,
+        },
+      },
+
+      timeScale: {
+        rightOffset: 5,
+        borderColor: "#374151",
+      },
     });
 
     const lineSeries = chart.addSeries(LineSeries, {
       color: "#22c55e",
-      lineWidth: 2,
+      lineWidth: 3,
     });
 
     const fetchData = async () => {
@@ -57,23 +70,19 @@ const SubGraphClient = () => {
 
         let formattedData = [];
 
-        // CoinGecko market_chart endpoint
         if (data.prices) {
           formattedData = data.prices.map((item) => ({
             time: Math.floor(item[0] / 1000),
             value: item[1],
           }));
-        }
-
-        // CoinGecko OHLC endpoint
-        else if (Array.isArray(data)) {
+        } else if (Array.isArray(data)) {
           formattedData = data.map((item) => ({
             time: Math.floor(item[0] / 1000),
             value: item[4],
           }));
         }
 
-        if (formattedData.length === 0) return;
+        if (!formattedData.length) return;
 
         lineSeries.setData(formattedData);
 
@@ -101,8 +110,11 @@ const SubGraphClient = () => {
     fetchData();
 
     const handleResize = () => {
+      if (!chartRef.current) return;
+
       chart.applyOptions({
         width: chartRef.current.clientWidth,
+        height: chartRef.current.clientHeight,
       });
     };
 
@@ -115,23 +127,24 @@ const SubGraphClient = () => {
   }, [api]);
 
   return (
-    <div className="w-full min-h-screen flex items-center bg-black">
-      <div className="bg-gray-900 p-4 rounded-lg shadow-lg w-full max-w-6xl mx-auto overflow-hidden">
-        <h2 className="text-white text-2xl font-bold mb-4">
+    <div className="w-screen h-screen bg-gray-900 overflow-hidden flex flex-col">
+      <div className="p-4">
+        <h2 className="text-white text-3xl font-bold">
           {companyName}
         </h2>
 
-        <div className="flex items-center gap-3 mb-4">
+        <div className="flex items-center gap-3 mt-3">
           <span
-            className={`text-lg font-bold ${
+            className={`text-xl font-bold ${
               isProfit ? "text-green-500" : "text-red-500"
             }`}
           >
-            {isProfit ? "▲" : "▼"} {Math.abs(change).toFixed(2)}
+            {isProfit ? "▲" : "▼"}{" "}
+            {Math.abs(change).toFixed(2)}
           </span>
 
           <span
-            className={`font-semibold ${
+            className={`text-lg font-semibold ${
               isProfit ? "text-green-500" : "text-red-500"
             }`}
           >
@@ -139,9 +152,12 @@ const SubGraphClient = () => {
             {Math.abs(changePercent).toFixed(2)}%)
           </span>
         </div>
-
-        <div ref={chartRef} className="w-full" />
       </div>
+
+      <div
+        ref={chartRef}
+        className="flex-1 w-full"
+      />
     </div>
   );
 };

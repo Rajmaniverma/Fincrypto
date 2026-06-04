@@ -3,10 +3,13 @@
 import React, { useEffect, useRef, useState } from "react";
 import { createChart, LineSeries } from "lightweight-charts";
 import { useRouter } from "next/navigation";
+import { VscGraphLine } from "react-icons/vsc";
+import { LuChartCandlestick } from "react-icons/lu";
 
 const Graph = ({ companyName, api }) => {
   const chartRef = useRef(null);
     const router = useRouter();
+    const [Gtype , setGtype] = useState(false);
   const [change, setChange] = useState(0);
   const [changePercent, setChangePercent] = useState(0);
   const [isProfit, setIsProfit] = useState(true);
@@ -20,9 +23,19 @@ const senddata = (api,companyName) => {
     if (!chartRef.current) return;
 
     const chart = createChart(chartRef.current, {
-      width: 300,
-      height: 150,
-      
+      width: 400,
+      height: 300,
+      rightPriceScale: {
+    scaleMargins: {
+      top: 0.1,
+      bottom: 0.1,
+      right:0, // 20% space at bottom
+    },
+  },
+  timeScale: {
+  rightOffset: 0,
+  fixRightEdge: true,
+},
 
       layout: {
         background: {
@@ -92,12 +105,18 @@ const senddata = (api,companyName) => {
   }, [api]);
 
   return (
-    <div className="bg-gray-900 p-4 rounded-lg shadow-lg cursor-pointer"  onClick={()=>senddata(api,companyName)}>
-      <h2 className="text-white text-xl font-bold mb-2">
+    <div className="bg-gray-900 p-2 rounded-lg shadow-lg cursor-pointer flex flex-col" >
+     <div className="flex justify-between p-2"> <h2 className="text-white text-xl font-bold mb-2">
         {companyName}
       </h2>
+      <h2 className="flex px-2">
+       <button className="mr-4"><VscGraphLine /></button> 
+       <button><LuChartCandlestick />
+</button> 
 
-      <div className="flex items-center gap-3 mb-4">
+        </h2></div>
+       <div onClick={()=>senddata(api,companyName)}>
+      <div className="flex items-center gap-3 mb-4"  >
         <span
           className={`text-lg font-bold ${
             isProfit ? "text-green-500" : "text-red-500"
@@ -117,7 +136,7 @@ const senddata = (api,companyName) => {
       </div>
 
       <div ref={chartRef} />
-    </div>
+    </div></div>
   );
 };
 

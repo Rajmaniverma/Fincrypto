@@ -6,6 +6,7 @@ const Home = () => {
   return (
     <div className='bg-white h-screen'>
       <Head/>
+    
       
       </div>
   )

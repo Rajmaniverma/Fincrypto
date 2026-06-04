@@ -4,7 +4,7 @@ const Stats = () => {
     const stats =["Price","Performance","Charts","Maps"];
     const day = [ "5M", "H","D","W","M"]
   return (
-    <div className=' w-full max-w-6xl  mx-auto'>
+    <div className=' w-full   mx-auto'>
         <nav className='flex justify-between'>
             <ul className='flex gap-x-2'>
               {stats.map((data,index)=>(   //yanha paar haam return or ( ) wala paranthesis laga bhul gaye isliye mapp me error tha
