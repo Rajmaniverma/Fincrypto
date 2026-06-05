@@ -5,11 +5,20 @@ import { createChart, LineSeries } from "lightweight-charts";
 import { useRouter } from "next/navigation";
 import { VscGraphLine } from "react-icons/vsc";
 import { LuChartCandlestick } from "react-icons/lu";
+import {
 
-const Graph = ({ companyName, api }) => {
+CandlestickSeries,
+} from "lightweight-charts";
+
+const Graph = ({ companyName, api,Capi}) => {
   const chartRef = useRef(null);
     const router = useRouter();
-    const [Gtype , setGtype] = useState(false);
+
+
+    
+
+
+const [Gtype, setGtype]= useState(false);
   const [change, setChange] = useState(0);
   const [changePercent, setChangePercent] = useState(0);
   const [isProfit, setIsProfit] = useState(true);
@@ -19,48 +28,53 @@ const senddata = (api,companyName) => {
 );
 };
 
-  useEffect(() => {
-    if (!chartRef.current) return;
 
-    const chart = createChart(chartRef.current, {
-      width: 400,
-      height: 300,
-      rightPriceScale: {
-    scaleMargins: {
-      top: 0.1,
-      bottom: 0.1,
-      right:0, // 20% space at bottom
+useEffect(() => {
+  if (!chartRef.current) return;
+
+  chartRef.current.innerHTML = "";
+
+  const chart = createChart(chartRef.current, {
+    width: 400,
+    height: 300,
+
+    layout: {
+      background: {
+        color: "#111827",
+      },
+      textColor: "#ffffff",
     },
-  },
-  timeScale: {
-  rightOffset: 0,
-  fixRightEdge: true,
-},
 
-      layout: {
-        background: {
-          color: "#111827",
-        },
-        textColor: "#ffffff",
+    grid: {
+      vertLines: {
+        color: "#374151",
       },
-
-      grid: {
-        vertLines: {
-          color: "#374151",
-        },
-        horzLines: {
-          color: "#374151",
-        },
+      horzLines: {
+        color: "#374151",
       },
-    });
+    },
 
-    const lineSeries = chart.addSeries(LineSeries, {
-      color: "#22c55e",
-      lineWidth: 2,
-    });
+    rightPriceScale: {
+      scaleMargins: {
+        top: 0.1,
+        bottom: 0.1,
+      },
+    },
 
-    const fetchData = async () => {
-      try {
+    timeScale: {
+      rightOffset: 0,
+      fixRightEdge: true,
+    },
+  });
+
+  const fetchData = async () => {
+    try {
+      if (Gtype) {
+        const lineSeries = chart.addSeries(LineSeries, {
+          color: "#22c55e",
+          lineWidth: 2,
+        });
+
         const response = await fetch(api);
         const data = await response.json();
 
@@ -90,32 +104,82 @@ const senddata = (api,companyName) => {
             color: diff >= 0 ? "#22c55e" : "#ef4444",
           });
         }
+      } else {
+        const candleSeries = chart.addSeries(
+          CandlestickSeries,
+          {
+            upColor: "#22c55e",
+            downColor: "#ef4444",
+            borderVisible: false,
+            wickUpColor: "#22c55e",
+            wickDownColor: "#ef4444",
+          }
+        );
 
-        chart.timeScale().fitContent();
-      } catch (error) {
-        console.log("Error fetching data:", error);
+        const response = await fetch(Capi);
+        const data = await response.json();
+
+        const formattedData = data.map(
+          ([timestamp, open, high, low, close]) => ({
+            time: Math.floor(timestamp / 1000),
+            open,
+            high,
+            low,
+            close,
+          })
+        );
+
+        candleSeries.setData(formattedData);
+
+        const firstPrice = formattedData[0]?.open;
+        const lastPrice =
+          formattedData[formattedData.length - 1]?.close;
+
+        if (
+          firstPrice !== undefined &&
+          lastPrice !== undefined
+        ) {
+          const diff = lastPrice - firstPrice;
+          const percent = (diff / firstPrice) * 100;
+
+          setChange(diff);
+          setChangePercent(percent);
+          setIsProfit(diff >= 0);
+        }
       }
-    };
 
-    fetchData();
+      chart.timeScale().fitContent();
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
-    return () => {
-      chart.remove();
-    };
-  }, [api]);
+  fetchData();
+
+  return () => {
+    chart.remove();
+  };
+}, [api, Capi, Gtype]);
+
+
+  
+
+
+
 
   return (
-    <div className="bg-gray-900 p-2 rounded-lg shadow-lg cursor-pointer flex flex-col" >
+    <div className="bg-gray-900 p-2 rounded-lg shadow-lg flex flex-col" >
      <div className="flex justify-between p-2"> <h2 className="text-white text-xl font-bold mb-2">
         {companyName}
       </h2>
       <h2 className="flex px-2">
-       <button className="mr-4"><VscGraphLine /></button> 
-       <button><LuChartCandlestick />
+       <button className="mr-4 cursor-pointer text-gray-600" onClick={()=>{setGtype(prev => !prev)}}><VscGraphLine /></button> 
+       <button className="mr-4 cursor-pointer text-gray-600" onClick={()=>{setGtype(prev=>!prev)}}><LuChartCandlestick />
 </button> 
 
         </h2></div>
-       <div onClick={()=>senddata(api,companyName)}>
+       <div className="cursor-pointer" onClick={()=>senddata(api,companyName)}>
+
       <div className="flex items-center gap-3 mb-4"  >
         <span
           className={`text-lg font-bold ${
