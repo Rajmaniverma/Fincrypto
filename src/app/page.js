@@ -5,7 +5,7 @@ import Dashboard from './frontend/Head/Dashboard'
 const Home = async () => {
   
   return (
-    <div className='bg-white h-screen'>
+    <div className='bg-white h-screen w-full'>
       <Head/>
     
       
