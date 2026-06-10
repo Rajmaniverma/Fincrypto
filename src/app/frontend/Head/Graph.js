@@ -68,91 +68,102 @@ useEffect(() => {
   });
 
   const fetchData = async () => {
-    try {
-      if (Gtype) {
-        const lineSeries = chart.addSeries(LineSeries, {
-          color: "#22c55e",
-          lineWidth: 2,
+  try {
+    if (Gtype) {
+      // LINE CHART
+      const lineSeries = chart.addSeries(LineSeries, {
+        color: "#22c55e",
+        lineWidth: 2,
+      });
+
+      const response = await fetch(api);
+      const data = await response.json();
+
+      console.log("Line Data:", data);
+
+      const formattedData = data.prices.map((item) => ({
+        time: Math.floor(item[0] / 1000),
+        value: Number(item[1]),
+      }));
+
+      lineSeries.setData(formattedData);
+
+      const firstPrice = formattedData[0]?.value;
+      const lastPrice =
+        formattedData[formattedData.length - 1]?.value;
+
+      if (
+        firstPrice !== undefined &&
+        lastPrice !== undefined
+      ) {
+        const diff = lastPrice - firstPrice;
+        const percent = (diff / firstPrice) * 100;
+
+        setChange(diff);
+        setChangePercent(percent);
+        setIsProfit(diff >= 0);
+
+        lineSeries.applyOptions({
+          color: diff >= 0 ? "#22c55e" : "#ef4444",
         });
-
-        const response = await fetch(api);
-        const data = await response.json();
-
-        const formattedData = data.prices.map((item) => ({
-          time: Math.floor(item[0] / 1000),
-          value: item[1],
-        }));
-
-        lineSeries.setData(formattedData);
-
-        const firstPrice = formattedData[0]?.value;
-        const lastPrice =
-          formattedData[formattedData.length - 1]?.value;
-
-        if (
-          firstPrice !== undefined &&
-          lastPrice !== undefined
-        ) {
-          const diff = lastPrice - firstPrice;
-          const percent = (diff / firstPrice) * 100;
-
-          setChange(diff);
-          setChangePercent(percent);
-          setIsProfit(diff >= 0);
-
-          lineSeries.applyOptions({
-            color: diff >= 0 ? "#22c55e" : "#ef4444",
-          });
+      }
+    } else {
+      // CANDLESTICK CHART
+      const candleSeries = chart.addSeries(
+        CandlestickSeries,
+        {
+          upColor: "#22c55e",
+          downColor: "#ef4444",
+          borderVisible: false,
+          wickUpColor: "#22c55e",
+          wickDownColor: "#ef4444",
         }
-      } else {
-        const candleSeries = chart.addSeries(
-          CandlestickSeries,
-          {
-            upColor: "#22c55e",
-            downColor: "#ef4444",
-            borderVisible: false,
-            wickUpColor: "#22c55e",
-            wickDownColor: "#ef4444",
-          }
-        );
+      );
 
-        const response = await fetch(Capi);
-        const data = await response.json();
+      const response = await fetch(Capi);
+      const data = await response.json();
 
-        const formattedData = data.map(
-          ([timestamp, open, high, low, close]) => ({
-            time: Math.floor(timestamp / 1000),
-            open,
-            high,
-            low,
-            close,
-          })
-        );
+      console.log("Candle Data:", data);
 
-        candleSeries.setData(formattedData);
-
-        const firstPrice = formattedData[0]?.open;
-        const lastPrice =
-          formattedData[formattedData.length - 1]?.close;
-
-        if (
-          firstPrice !== undefined &&
-          lastPrice !== undefined
-        ) {
-          const diff = lastPrice - firstPrice;
-          const percent = (diff / firstPrice) * 100;
-
-          setChange(diff);
-          setChangePercent(percent);
-          setIsProfit(diff >= 0);
-        }
+      if (!Array.isArray(data)) {
+        console.error("Invalid candle data:", data);
+        return;
       }
 
-      chart.timeScale().fitContent();
-    } catch (error) {
-      console.log(error);
+      const formattedData = data.map(
+        ([timestamp, open, high, low, close]) => ({
+          time: Math.floor(timestamp / 1000),
+          open: Number(open),
+          high: Number(high),
+          low: Number(low),
+          close: Number(close),
+        })
+      );
+
+      candleSeries.setData(formattedData);
+
+      const firstPrice = formattedData[0]?.open;
+      const lastPrice =
+        formattedData[formattedData.length - 1]?.close;
+
+      if (
+        firstPrice !== undefined &&
+        lastPrice !== undefined
+      ) {
+        const diff = lastPrice - firstPrice;
+        const percent = (diff / firstPrice) * 100;
+
+        setChange(diff);
+        setChangePercent(percent);
+        setIsProfit(diff >= 0);
+      }
     }
-  };
+
+    chart.timeScale().fitContent();
+  } catch (error) {
+    console.error("Chart Error:", error);
+  }
+};
 
   fetchData();
 
