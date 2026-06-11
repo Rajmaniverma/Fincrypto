@@ -20,6 +20,7 @@ export default function Admin() {
       }),
     });
 
+
     const data = await response.json();
     if(data.success){
       alert("data save successfuly ✅✅")
@@ -29,7 +30,13 @@ export default function Admin() {
     }
     console.log(data);
   };
-
+    const Delete =async ()=>{
+      const res = await fetch('/api/delete',{
+        method:"DELETE",
+      });
+      const data = await res.json();
+      alert(data.message);
+    }
   return (
     <div className="bg-black min-h-screen  w-full ">
     <div className=" max-w-6xl bg-white/10 mx-auto h-150 flex flex-col gap-y-5 p-5">
@@ -58,12 +65,20 @@ export default function Admin() {
         required
       />
       
-
-      <button 
+      <div className="flex justify-between">
+              <button 
       className="bg-blue-600 text-white w-20 text-[14px] rounded-xs p-1 hover:scale-95 active:scale-105 duration-300 cursor-pointer" 
        onClick={saveUser}>
         Save User
       </button>
+              <button 
+      className="bg-blue-600 text-white w-20 text-[14px] rounded-xs p-1 hover:scale-95 active:scale-105 duration-300 cursor-pointer" 
+       onClick={Delete}>
+        Delete
+      </button>
+
+      </div>
+
     </div>
     </div>
   );

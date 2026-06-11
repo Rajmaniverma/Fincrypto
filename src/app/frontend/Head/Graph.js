@@ -18,13 +18,13 @@ const Graph = ({ companyName, api,Capi}) => {
     
 
 
-const [Gtype, setGtype]= useState(false);
+const [Gtype, setGtype]= useState(true);
   const [change, setChange] = useState(0);
   const [changePercent, setChangePercent] = useState(0);
   const [isProfit, setIsProfit] = useState(true);
 const senddata = (api,companyName) => {
   router.push(
-  `./frontend/Head/SubGraph?api=${encodeURIComponent(api)}&company=${encodeURIComponent(companyName)}`
+  `./frontend/Head/SubGraph?company=${encodeURIComponent(companyName)}`
 );
 };
 
@@ -184,8 +184,12 @@ useEffect(() => {
         {companyName}
       </h2>
       <h2 className="flex px-2">
-       <button className="mr-4 cursor-pointer text-gray-600" onClick={()=>{setGtype(prev => !prev)}}><VscGraphLine /></button> 
-       <button className="mr-4 cursor-pointer text-gray-600" onClick={()=>{setGtype(prev=>!prev)}}><LuChartCandlestick />
+       <button              className={`text-2xl cursor-pointer mx-2 ${
+                Gtype ? "text-green-500" : "text-gray-500"
+              }`} onClick={()=>{setGtype(true)}}><VscGraphLine /></button> 
+       <button              className={`text-2xl cursor-pointer ${
+                Gtype ?  "text-gray-500" :"text-green-500" 
+              }`} onClick={()=>{setGtype(false)}}><LuChartCandlestick />
 </button> 
 
         </h2></div>
