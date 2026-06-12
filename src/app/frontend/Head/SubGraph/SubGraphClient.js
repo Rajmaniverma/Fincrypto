@@ -62,11 +62,11 @@ const filterDataByTimeFrame = (data) => {
   let seconds;
 
   switch (timeFrame) {
-    case "10M":
+    case "10Min":
       seconds = 10 * 60;
       break;
 
-    case "30M":
+    case "30Min":
       seconds = 30 * 60;
       break;
 
@@ -294,7 +294,7 @@ const filterDataByTimeFrame = (data) => {
 
         {/* Timeframe Buttons */}
         <div className="flex gap-3 mt-4">
-          {["10M", "30M", "1H", "1D", "1M", "1Y"].map(
+          {["10Min", "30Min", "1H", "1D", "1M", "1Y"].map(
             (frame) => (
               <button
                 key={frame}
