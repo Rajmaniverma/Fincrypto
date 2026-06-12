@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import Clock from "./Clock";
+
 import { useRouter } from "next/navigation";
 
 const Navigationbar = () => {
@@ -18,11 +18,9 @@ const Navigationbar = () => {
         </ul>
 
         <ul className="flex flex-2 justify-end-safe gap-x-2">
-          <li className="flex gap-x-2">
-            <Clock />
-          </li>
 
-          |<li className="hover:bg-gray-500 cursor-pointer">❔ Help</li>|
+
+          <li className="hover:bg-gray-500 cursor-pointer">Help❔</li>|
           
           <li
             className="hover:bg-gray-500 cursor-pointer"

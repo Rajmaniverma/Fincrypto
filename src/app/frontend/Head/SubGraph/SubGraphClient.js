@@ -20,14 +20,16 @@ const SubGraphClient = () => {
   const [changePercent, setChangePercent] = useState(0);
   const [isProfit, setIsProfit] = useState(true);
 
-  const [Gtype, setGtype] = useState(true); // true = line, false = candle
+  const [Gtype, setGtype] = useState(true);
+
+  // NEW
+  const [timeFrame, setTimeFrame] = useState("1D");
 
   const searchParams = useSearchParams();
 
   const CompanyName =
     searchParams.get("company") ?? "Unknown Company";
 
-  // Fetch Graph URLs from backend
   useEffect(() => {
     async function fetchCompanyData() {
       try {
@@ -45,8 +47,6 @@ const SubGraphClient = () => {
 
         setApi(data.Graph);
         setCApi(data.Candle);
-        console.log(api);
-        console.log(cApi)
       } catch (error) {
         console.error(error);
       }
@@ -55,7 +55,46 @@ const SubGraphClient = () => {
     fetchCompanyData();
   }, [CompanyName]);
 
-  // Create Chart
+  // Filter according to selected timeframe
+const filterDataByTimeFrame = (data) => {
+  const now = Math.floor(Date.now() / 1000);
+
+  let seconds;
+
+  switch (timeFrame) {
+    case "10M":
+      seconds = 10 * 60;
+      break;
+
+    case "30M":
+      seconds = 30 * 60;
+      break;
+
+    case "1H":
+      seconds = 60 * 60;
+      break;
+
+    case "1D":
+      seconds = 24 * 60 * 60;
+      break;
+
+    case "1M":
+      seconds = 30 * 24 * 60 * 60;
+      break;
+
+    case "1Y":
+      seconds = 365 * 24 * 60 * 60;
+      break;
+
+    default:
+      seconds = 24 * 60 * 60;
+  }
+
+  return data.filter(
+    (item) => item.time >= now - seconds
+  );
+};
+
   useEffect(() => {
     if (!chartRef.current) return;
     if (!api || !cApi) return;
@@ -83,7 +122,7 @@ const SubGraphClient = () => {
 
     const loadChart = async () => {
       try {
-        // LINE CHART
+        // LINE GRAPH
         if (Gtype) {
           const lineSeries = chart.addSeries(LineSeries, {
             color: "#22c55e",
@@ -93,32 +132,46 @@ const SubGraphClient = () => {
           const response = await fetch(api);
           const data = await response.json();
 
-          const formattedData = data.prices.map((item) => ({
-            time: Math.floor(item[0] / 1000),
-            value: Number(item[1]),
-          }));
+          const formattedData = data.prices.map(
+            (item) => ({
+              time: Math.floor(item[0] / 1000),
+              value: Number(item[1]),
+            })
+          );
 
-          lineSeries.setData(formattedData);
+          const filteredData =
+            filterDataByTimeFrame(formattedData);
 
-          const firstPrice = formattedData[0]?.value;
+          lineSeries.setData(filteredData);
+
+          const firstPrice =
+            filteredData[0]?.value;
           const lastPrice =
-            formattedData[formattedData.length - 1]?.value;
+            filteredData[
+              filteredData.length - 1
+            ]?.value;
 
           if (firstPrice && lastPrice) {
-            const diff = lastPrice - firstPrice;
-            const percent = (diff / firstPrice) * 100;
+            const diff =
+              lastPrice - firstPrice;
+
+            const percent =
+              (diff / firstPrice) * 100;
 
             setChange(diff);
             setChangePercent(percent);
             setIsProfit(diff >= 0);
 
             lineSeries.applyOptions({
-              color: diff >= 0 ? "#22c55e" : "#ef4444",
+              color:
+                diff >= 0
+                  ? "#22c55e"
+                  : "#ef4444",
             });
           }
         }
 
-        // CANDLE CHART
+        // CANDLE GRAPH
         else {
           const candleSeries = chart.addSeries(
             CandlestickSeries,
@@ -136,7 +189,9 @@ const SubGraphClient = () => {
 
           const formattedData = data.map(
             ([timestamp, open, high, low, close]) => ({
-              time: Math.floor(timestamp / 1000),
+              time: Math.floor(
+                timestamp / 1000
+              ),
               open: Number(open),
               high: Number(high),
               low: Number(low),
@@ -144,15 +199,25 @@ const SubGraphClient = () => {
             })
           );
 
-          candleSeries.setData(formattedData);
+          const filteredData =
+            filterDataByTimeFrame(formattedData);
 
-          const firstPrice = formattedData[0]?.open;
+          candleSeries.setData(filteredData);
+
+          const firstPrice =
+            filteredData[0]?.open;
+
           const lastPrice =
-            formattedData[formattedData.length - 1]?.close;
+            filteredData[
+              filteredData.length - 1
+            ]?.close;
 
           if (firstPrice && lastPrice) {
-            const diff = lastPrice - firstPrice;
-            const percent = (diff / firstPrice) * 100;
+            const diff =
+              lastPrice - firstPrice;
+
+            const percent =
+              (diff / firstPrice) * 100;
 
             setChange(diff);
             setChangePercent(percent);
@@ -162,7 +227,10 @@ const SubGraphClient = () => {
 
         chart.timeScale().fitContent();
       } catch (error) {
-        console.error("Chart Error:", error);
+        console.error(
+          "Chart Error:",
+          error
+        );
       }
     };
 
@@ -170,19 +238,26 @@ const SubGraphClient = () => {
 
     const handleResize = () => {
       chart.applyOptions({
-        width: chartRef.current.clientWidth,
-        height: chartRef.current.clientHeight,
+        width:
+          chartRef.current.clientWidth,
+        height:
+          chartRef.current.clientHeight,
       });
     };
 
-    window.addEventListener("resize", handleResize);
+    window.addEventListener(
+      "resize",
+      handleResize
+    );
 
     return () => {
-      window.removeEventListener("resize", handleResize);
+      window.removeEventListener(
+        "resize",
+        handleResize
+      );
       chart.remove();
     };
-  }, [api, cApi, Gtype]);
-
+  }, [api, cApi, Gtype, timeFrame]);
 
   return (
     <div className="w-screen h-screen bg-gray-900 flex flex-col overflow-hidden">
@@ -195,7 +270,9 @@ const SubGraphClient = () => {
           <div className="flex gap-4">
             <button
               className={`text-2xl cursor-pointer ${
-                Gtype ? "text-green-500" : "text-gray-500"
+                Gtype
+                  ? "text-green-500"
+                  : "text-gray-500"
               }`}
               onClick={() => setGtype(true)}
             >
@@ -204,13 +281,36 @@ const SubGraphClient = () => {
 
             <button
               className={`text-2xl cursor-pointer ${
-                !Gtype ? "text-green-500" : "text-gray-500"
+                !Gtype
+                  ? "text-green-500"
+                  : "text-gray-500"
               }`}
               onClick={() => setGtype(false)}
             >
               <LuChartCandlestick />
             </button>
           </div>
+        </div>
+
+        {/* Timeframe Buttons */}
+        <div className="flex gap-3 mt-4">
+          {["10M", "30M", "1H", "1D", "1M", "1Y"].map(
+            (frame) => (
+              <button
+                key={frame}
+                onClick={() =>
+                  setTimeFrame(frame)
+                }
+                className={`px-4 py-1 rounded-lg font-semibold transition ${
+                  timeFrame === frame
+                    ? "bg-green-500 text-white"
+                    : "bg-gray-700 text-gray-300"
+                }`}
+              >
+                {frame}
+              </button>
+            )
+          )}
         </div>
 
         <div className="flex items-center gap-3 mt-4">
@@ -233,7 +333,10 @@ const SubGraphClient = () => {
             }`}
           >
             ({isProfit ? "+" : "-"}
-            {Math.abs(changePercent).toFixed(2)}%)
+            {Math.abs(
+              changePercent
+            ).toFixed(2)}
+            %)
           </span>
         </div>
       </div>
